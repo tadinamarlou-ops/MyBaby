@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be My Valentine?</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    text-align: center;
+    position: relative;
+}
+
+.container {
+    z-index: 2;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 26px;
+    color: white;
+}
+
+h2 {
+    color: white;
+    margin-bottom: 25px;
+}
+
+.buttons {
+    position: relative;
+    width: 260px;
+    height: 140px;
+    margin: auto;
+}
+
+button {
+    padding: 14px 28px;
+    font-size: 18px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    position: absolute;
+    transition: all 0.3s ease;
+}
+
+#yesBtn {
+    background: white;
+    color: #ff4d6d;
+    left: 20px;
+    top: 50px;
+    transform: scale(1);
+}
+
+#noBtn {
+    background: #ff4d6d;
+    color: white;
+    right: 20px;
+    top: 50px;
+}
+
+#message {
+    display: none;
+    margin-top: 25px;
+    font-size: 18px;
+    color: white;
+    animation: pop 0.8s ease forwards;
+}
+
+@keyframes pop {
+    0% { opacity: 0; transform: scale(0.5); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Floating hearts */
+.heart {
+    position: absolute;
+    bottom: -30px;
+    font-size: 24px;
+    animation: float 6s linear infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-110vh); opacity: 0; }
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="container">
+    <h1>Hi rinrin 💖</h1>
+    <h2>can't believe we've already been together for a month yesterday. even though it's been just a short time, every day with you has been so special and meaningful to me. from the little laughs we share to the sweet moments that make me smile, you've made my life brighter in ways I never expected.
+
+being with you feels easy, fun, and full of warmth. I really appreciate everything about you, from your smile, your laugh, your kind heart, and the way you make even ordinary days feel magical.
+
+so on this special day, I just want to ask you. will you be my Valentine? 💖</h2>
+
+    <div class="buttons">
+        <button id="yesBtn">Yes</button>
+        <button id="noBtn">No</button>
+    </div>
+
+    <div id="message">
+        💕 I knew you would say YES! 💕 <br><br>
+        SEE YOU LATER, BABYYY!😘❤️
+    </div>
+</div>
+
+<!-- Autoplay Music -->
+<audio id="bgMusic" autoplay loop>
+    <source src="Laufey - Valentine (Official Audio).mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const message = document.getElementById("message");
+const music = document.getElementById("bgMusic");
+
+let yesScale = 1;
+
+/* Try autoplay immediately */
+window.addEventListener("load", function() {
+    music.play().catch(function() {
+        console.log("Autoplay blocked by browser.");
+    });
+});
+
+function moveNoButton() {
+    const maxX = window.innerWidth - noBtn.offsetWidth;
+    const maxY = window.innerHeight - noBtn.offsetHeight;
+
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
+
+    noBtn.style.position = "fixed";
+    noBtn.style.left = randomX + "px";
+    noBtn.style.top = randomY + "px";
+
+    if (navigator.vibrate) {
+        navigator.vibrate(100);
+    }
+
+    yesScale += 0.15;
+    yesBtn.style.transform = "scale(" + yesScale + ")";
+}
+
+noBtn.addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    moveNoButton();
+});
+
+noBtn.addEventListener("mouseover", moveNoButton);
+
+yesBtn.addEventListener("click", function() {
+    message.style.display = "block";
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    startConfetti();
+});
+
+/* Floating hearts */
+function createHeart() {
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.innerHTML = "💖";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.fontSize = (Math.random() * 15 + 20) + "px";
+    heart.style.animationDuration = (Math.random() * 3 + 4) + "s";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
+}
+setInterval(createHeart, 400);
+
+/* Confetti */
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let confettiPieces = [];
+
+function startConfetti() {
+    for (let i = 0; i < 150; i++) {
+        confettiPieces.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            r: Math.random() * 6 + 4,
+            color: "hsl(" + Math.random() * 360 + ",100%,50%)"
+        });
+    }
+    animateConfetti();
+}
+
+function animateConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confettiPieces.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.r, p.r);
+        p.y += 4;
+        if (p.y > canvas.height) p.y = -10;
+    });
+    requestAnimationFrame(animateConfetti);
+}
+</script>
+
+</body>
+</html>
